@@ -1,0 +1,3 @@
+[{{ RCLONE_STORAGE.name }}]
+{% for key, value in RCLONE_STORAGE.items() %}{% if key != 'name' %}{{ key }} = {{ value }}{% endif %}
+{% endfor %}

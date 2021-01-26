@@ -1,0 +1,78 @@
+#!/bin/bash
+# shellcheck disable=SC1091
+. /usr/local/include/backup-functions.sh
+
+local_days={{ LOCAL_DAYS }}
+{% if RCLONE_STORAGE is defined %}remote_backups_daily={{ REMOTE_SCHEME.daily }}
+remote_backups_weekly={{ REMOTE_SCHEME.weekly }}
+remote_backups_monthly={{ REMOTE_SCHEME.monthly }}
+{% endif %}
+tar_exclude=({%for dir in COMPRES_DIRS_EXCLUDE %}--exclude={{ dir }} {% endfor %})
+
+redis_cli_opts=(-h {{ REDIS_HOST | default('redis') }}{{ ' -a ' ~ REDIS_PASSWORD if REDIS_PASSWORD is defined }} --raw)
+
+mongo_opts=(-h {{ MONGO_HOST | default('mongo') }})
+mongo_ignore_databases="{%for db in MONGO_IGNORE_DBS %}{{ db }}{{ '|' if not loop.last else '' }}{% endfor %}"
+
+mysql_ignore_databases="{%for db in MYSQL_IGNORE_DBS %}{{ db }}{{ '|' if not loop.last else '' }}{% endfor %}"
+
+pg_ignore_databases="{%for db in POSTGRES_IGNORE_DBS %}{{ db }}{{ '|' if not loop.last else '' }}{% endfor %}"
+
+export PGHOST="{{ POSTGRES_HOST | default('postgres') }}"
+export PGUSER="{{ POSTGRES_USER | default('postgres') }}"
+export PGPASSWORD="{{ POSTGRES_PASSWORD | default('postgres') }}"
+
+# shellcheck disable=SC2154
+function make_backup() {
+  show_notice "Backup process started..."
+  test -d "$backup_dir" && clean_dir "$backup_dir" "$local_days"
+
+  check_free_space "$backup_dir" && {
+{%for dir in COMPRES_DIRS %}    compress_dir "{{ dir }}" "$backup_dir/$current_date/dirs/{{ dir.split('/') | last }}.tar.$compress_ext"
+{% endfor %}{% if POSTGRES_PASSWORD is defined %}    pg_dump_all "$backup_dir/$current_date/postgres"{% endif %}
+{% if MYSQL_PASSWORD is defined %}    mysql_dump_all "$backup_dir/$current_date/mysql"{% endif %}
+{% if REDIS_HOST is defined or REDIS_PASSWORD is defined %}    redis_rdb_backup "$backup_dir/$current_date/redis"{% endif %}
+{% if MONGO_HOST is defined %}    mongo_dump_all "$backup_dir/$current_date/mongo"{% endif %}
+{% if CUSTOM_BACKUP_COMMANDS is defined %}{{ CUSTOM_BACKUP_COMMANDS }}{% endif %}
+    save_backup_size "$backup_dir/$current_date"
+  }
+}
+
+function upload_backup() {
+{% if RCLONE_STORAGE is defined %}  show_notice "Upload process started..."
+{% for dir in SYNC_DIRS %}  rclone_sync {{ dir }} {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.name }}/sync/{{ dir.split('/') | last }}
+{% endfor %}  rclone_sync "$backup_dir/$current_date" "{{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.name }}/$type/$current_date"
+  rclone_purge {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.name }}/$type $remote_backups
+  show_notice "Upload process ended."{% else %}  return 0;{% endif %}
+}
+
+function send_notify() {
+  show_error "Script ${0##*/} failed. Check logs" 2>&1 | mail -s "{{ '[' ~ SERVER_NAME ~ ']' if SERVER_NAME is defined }} Backup failed" {{ MAILTO | default('root')}}
+}
+
+function main() {
+  show_notice "Backup script started."
+  detect_type
+  make_flock
+
+  case "$1" in
+    "--backup"|"-b") 
+      make_backup
+    ;;
+    "--upload"|"-u")
+      upload_backup
+    ;;
+    *)
+      make_backup
+      upload_backup
+    ;;
+  esac
+
+  test "$err" -eq 1 && {
+    show_error "Script ${0##*/} failed."
+{% if MAILTO is defined %}    send_notify{% endif %}
+  }
+  show_notice "Backup script completed."
+}
+
+main "${@}"

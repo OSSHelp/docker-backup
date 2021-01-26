@@ -1,0 +1,9 @@
+#!/usr/bin/python3
+
+import os
+import pymongo
+
+myclient = pymongo.MongoClient("mongodb://" + os.environ.get('MONGO_HOST') + ":27017/")  # noqa: E501
+
+for db in myclient.list_databases():
+    print(db["name"])

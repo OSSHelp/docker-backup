@@ -1,0 +1,1 @@
+{{ CRON_TIME.min }} {{ CRON_TIME.hour }} {{ CRON_TIME.day | default('*') }} {{ CRON_TIME.mounth | default('*') }} {{ CRON_TIME.day_of_week | default('*') }} /usr/local/bin/backup.sh

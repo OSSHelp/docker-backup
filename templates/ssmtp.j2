@@ -1,0 +1,9 @@
+root=postmaster
+mailhub={{ SSMTP_MAILHUB }}
+hostname={{ SSMTP_HOSTNAME }}
+{% if SSMTP_REWRITE_DOMAIN is defined %}
+rewriteDomain={{ SSMTP_REWRITE_DOMAIN }}
+{% endif %}
+{% if SSMTP_FROM_LINE_OVERRIDE is defined and SSMTP_FROM_LINE_OVERRIDE %}
+FromLineOverride=YES
+{% endif %}
