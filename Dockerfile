@@ -1,4 +1,4 @@
-FROM alpine:3.12.0 as pbzip2
+FROM alpine:3.13 as pbzip2
 
 WORKDIR /tmp
 # hadolint ignore=DL3018,DL3003
@@ -10,12 +10,12 @@ RUN apk add --no-cache --virtual .build-deps bzip2-dev g++ make \
 	&& apk del --no-cache .build-deps \
 	&& rm -r /tmp/pbzip2-1.1.13
 
-FROM alpine:3.12.0
+FROM alpine:3.13
 # hadolint ignore=DL3018,DL3013
 RUN apk add --no-cache bash python3 py3-setuptools py3-yaml tzdata tar bzip2 \
 	coreutils ssmtp mailx rclone redis mysql-client postgresql mongodb-tools \
 	&& apk add --no-cache --virtual .build-deps py-pip \
-	&& pip install j2cli pymongo \
+	&& pip install --no-cache-dir j2cli pymongo \
 	&& mkdir -p /root/.config/rclone /usr/local/include /var/backups \
 	&& apk del --no-cache .build-deps
 
