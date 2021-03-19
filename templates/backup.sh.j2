@@ -9,6 +9,9 @@ remote_backups_monthly={{ REMOTE_SCHEME.monthly }}
 {% endif %}
 tar_exclude=({%for dir in COMPRES_DIRS_EXCLUDE %}--exclude={{ dir }} {% endfor %})
 
+pushgateway_url={{ PUSHGATEWAY_URL | default('http://pushgateway:9091') }}/metrics/job/${0##*/}
+pushgateway_opts=({{ PUSHGATEWAY_OPTS | default('')}})
+
 redis_cli_opts=(-h {{ REDIS_HOST | default('redis') }}{{ ' -a ' ~ REDIS_PASSWORD if REDIS_PASSWORD is defined }} --raw)
 
 mongo_opts=(-h {{ MONGO_HOST | default('mongo') }})
@@ -52,8 +55,10 @@ function send_notify() {
 
 function main() {
   show_notice "Backup script started."
+  test "${NO_PUSHGATEWAY}" -ne 1 && pushgateway_start_backup
   detect_type
   make_flock
+  backup_start_time=$(date +%s)
 
   case "$1" in
     "--backup"|"-b") 
@@ -73,6 +78,10 @@ function main() {
 {% if MAILTO is defined %}    send_notify{% endif %}
   }
   show_notice "Backup script completed."
+  test "${NO_PUSHGATEWAY}" -ne 1 && {
+    backup_end_time=$(date +%s)
+    pushgateway_send_result "${err}"
+  }
 }
 
 main "${@}"

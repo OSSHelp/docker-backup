@@ -75,10 +75,13 @@ Setting|Default|Description
 `MYSQL_USER`|`root`|MySQL user
 `MYSQL_PASSWORD`|-|MySQL password
 `MYSQL_IGNORE_DBS`|`[information_schema, performance_schema, pinba, phpmyadmin, sys]`|List of ignored databases
+`NO_PUSHGATEWAY` |`0`|Disable send metrics to Pushgateway if `1`
 `POSTGRES_HOST`|`postgres`|PostgreSQL host
 `POSTGRES_USER`|`postgres`|PostgreSQL user
 `POSTGRES_PASSWORD`|-|PostgreSQL password
 `POSTGRES_IGNORE_DBS`|`[template]`|List of ignored databases
+`PUSHGATEWAY_URL`|`http://pushgateway:9091`|Pushgateway URL
+`PUSHGATEWAY_OPTS`|`-`|Additional curl parameters, which is used by functions to transfer data to Pushgateway
 `RCLONE_STORAGE`|-|Rclone remote storage
 `REMOTE_SCHEME`|`{daily: 7, weekly: 4, monthly: 3}`|Number of remote copies by type
 `REDIS_HOST`|-|Redis host
