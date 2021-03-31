@@ -59,6 +59,7 @@ Internal vars in CUSTOM_BACKUP_COMMANDS must be escaped like `$$`.
 
 Setting|Default|Description
 ---|---|---
+`ARCHIVER_OPTS`|`-`|Additional optioins for archiver
 `COMPRES_DIRS`|`[]`|List of directories for backup
 `COMPRES_DIRS_EXCLUDE`|`[]`|List of direcotries for exlude
 `CRON_TIME`|`{min: 15, hour: 3}`|Backup task cron time

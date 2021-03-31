@@ -8,6 +8,7 @@ remote_backups_weekly={{ REMOTE_SCHEME.weekly }}
 remote_backups_monthly={{ REMOTE_SCHEME.monthly }}
 {% endif %}
 tar_exclude=({%for dir in COMPRES_DIRS_EXCLUDE %}--exclude={{ dir }} {% endfor %})
+archiver_opts=({{ ARCHIVER_OPTS | default('')}})
 
 pushgateway_url={{ PUSHGATEWAY_URL | default('http://pushgateway:9091') }}/metrics/job/${0##*/}
 pushgateway_opts=({{ PUSHGATEWAY_OPTS | default('')}})
