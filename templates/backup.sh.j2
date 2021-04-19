@@ -10,7 +10,8 @@ remote_backups_monthly={{ REMOTE_SCHEME.monthly }}
 tar_exclude=({%for dir in COMPRES_DIRS_EXCLUDE %}--exclude={{ dir }} {% endfor %})
 archiver_opts=({{ ARCHIVER_OPTS | default('')}})
 
-pushgateway_url={{ PUSHGATEWAY_URL | default('http://pushgateway:9091') }}/metrics/job/${0##*/}
+pushgateway_instance="{{ PUSHGATEWAY_INSTANCE | default('docker_backup') }}"
+pushgateway_url="{{ PUSHGATEWAY_URL | default('http://pushgateway:9091/pushgateway') }}/metrics/job/${0##*/}/instance/${pushgateway_instance}"
 pushgateway_opts=({{ PUSHGATEWAY_OPTS | default('')}})
 
 redis_cli_opts=(-h {{ REDIS_HOST | default('redis') }}{{ ' -a ' ~ REDIS_PASSWORD if REDIS_PASSWORD is defined }} --raw)
@@ -74,14 +75,14 @@ function main() {
     ;;
   esac
 
-  test "$err" -eq 1 && {
+  test "${glbl_err}" -eq 1 && {
     show_error "Script ${0##*/} failed."
 {% if MAILTO is defined %}    send_notify{% endif %}
   }
   show_notice "Backup script completed."
   test "${NO_PUSHGATEWAY}" -ne 1 && {
     backup_end_time=$(date +%s)
-    pushgateway_send_result "${err}"
+    pushgateway_send_result "${glbl_err}"
   }
 }
 
