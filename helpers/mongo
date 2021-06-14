@@ -3,7 +3,10 @@
 import os
 import pymongo
 
-myclient = pymongo.MongoClient("mongodb://" + os.environ.get('MONGO_HOST') + ":27017/")  # noqa: E501
+if os.environ.get('MONGO_PASSWORD'):
+    myclient = pymongo.MongoClient("mongodb://" + os.environ.get('MONGO_USER') + ":" + os.environ.get('MONGO_PASSWORD') + "@" + os.environ.get('MONGO_HOST', 'mongodb') + ":" + os.environ.get('MONGO_PORT', '27017') + "/")  # noqa: E501
+else:
+    myclient = pymongo.MongoClient("mongodb://" + os.environ.get('MONGO_HOST', 'mongodb') + ":" + os.environ.get('MONGO_PORT', '27017') + "/")  # noqa: E501
 
 for db in myclient.list_databases():
     print(db["name"])
