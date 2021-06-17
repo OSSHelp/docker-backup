@@ -16,11 +16,9 @@ pushgateway_opts=({{ PUSHGATEWAY_OPTS | default('')}})
 
 redis_cli_opts=(-h {{ REDIS_HOST | default('redis') }}{{ ' -a ' ~ REDIS_PASSWORD if REDIS_PASSWORD is defined }} --raw)
 
-{% if MONGO_HOST is defined %}mongo_opts=(-h {{ MONGO_HOST }}{% if MONGO_USER is defined %} -u {% endif %}{{ MONGO_USER }}{% if MONGO_PASSWORD is defined %} -p {% endif %}{{ MONGO_PASSWORD }}{% if MONGO_PORT is defined %} --port {% endif %}{{ MONGO_PORT }}{% if MONGO_AUTHDB is defined %} --authenticationDatabase {% endif %}{{ MONGO_AUTHDB }})
-{% else %}mongo_opts=(-h mongodb){% if MONGO_PORT is defined %} --port {% endif %}{{ MONGO_PORT }}{% if MONGO_AUTHDB is defined %} --authenticationDatabase {% endif %}{{ MONGO_AUTHDB }}
-{% endif %}
-
+{% if MONGO_HOST is defined %}mongo_opts=(-h {{ MONGO_HOST }}{% if MONGO_PORT is defined %} --port {{ MONGO_PORT }}{% endif %}{% if MONGO_USER is defined %} -u {{ MONGO_USER }}{% endif %}{% if MONGO_PASSWORD is defined %} -p {{ MONGO_PASSWORD }}{% endif %}{% if MONGO_AUTHDB is defined %} --authenticationDatabase {{ MONGO_AUTHDB }}{% endif %})
 mongo_ignore_databases="{%for db in MONGO_IGNORE_DBS %}{{ db }}{{ '|' if not loop.last else '' }}{% endfor %}"
+{% endif %}
 
 mysql_ignore_databases="{%for db in MYSQL_IGNORE_DBS %}{{ db }}{{ '|' if not loop.last else '' }}{% endfor %}"
 
