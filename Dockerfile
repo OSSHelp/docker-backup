@@ -34,6 +34,7 @@ ENV TIMEZONE="Europe/Moscow" \
 	SYNC_DIRS="[]" \
 	POSTGRES_IGNORE_DBS="[template]" \
 	MYSQL_IGNORE_DBS="[information_schema, performance_schema, pinba, phpmyadmin, sys]" \
-	MONGO_IGNORE_DBS="[]"
+	MONGO_IGNORE_DBS="[]" \
+	NO_PUSHGATEWAY="0"
 
 ENTRYPOINT ["entrypoint.sh"]
