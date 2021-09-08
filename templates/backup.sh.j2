@@ -64,15 +64,23 @@ function main() {
   backup_start_time=$(date +%s)
 
   case "$1" in
-    "--backup"|"-b") 
+    "--backup"|"-b")
+      test "${no_pushgateway}" -ne 1 && pushgateway_send_backup_start
       make_backup
+      test "${no_pushgateway}" -ne 1 && pushgateway_send_backup_end
     ;;
     "--upload"|"-u")
+      test "${no_pushgateway}" -ne 1 && pushgateway_send_upload_start
       upload_backup
+      test "${no_pushgateway}" -ne 1 && pushgateway_send_upload_end
     ;;
     *)
+      test "${no_pushgateway}" -ne 1 && pushgateway_send_backup_start
       make_backup
+      test "${no_pushgateway}" -ne 1 && pushgateway_send_backup_end
+      test "${no_pushgateway}" -ne 1 && pushgateway_send_upload_start
       upload_backup
+      test "${no_pushgateway}" -ne 1 && pushgateway_send_upload_end
     ;;
   esac
 
