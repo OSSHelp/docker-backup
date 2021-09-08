@@ -23,7 +23,7 @@ COPY templates/* /usr/local/src/
 COPY helpers/* /usr/local/bin/
 COPY entrypoint.sh /usr/local/bin/
 COPY --from=pbzip2 /usr/bin/pbzip2 /usr/bin/
-ADD https://oss.help/scripts/backup/backup-functions/backup-functions.sh /usr/local/include/
+ADD https://oss.help/scripts/backup/backup-functions/1-latest/backup-functions.sh /usr/local/include/
 
 ENV TIMEZONE="Europe/Moscow" \
 	CRON_TIME="{min: 15, hour: 3}" \
