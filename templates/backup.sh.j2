@@ -58,7 +58,7 @@ function send_notify() {
 
 function main() {
   show_notice "Backup script started."
-  test "${NO_PUSHGATEWAY}" -ne 1 && pushgateway_start_backup
+  test "${NO_PUSHGATEWAY}" -ne 1 && pushgateway_send_script_start
   detect_type
   make_flock
   backup_start_time=$(date +%s)
