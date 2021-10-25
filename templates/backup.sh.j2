@@ -61,7 +61,6 @@ function main() {
   test "${NO_PUSHGATEWAY}" -ne 1 && pushgateway_send_script_start
   detect_type
   make_flock
-  backup_start_time=$(date +%s)
 
   case "$1" in
     "--backup"|"-b")
@@ -90,7 +89,6 @@ function main() {
   }
   show_notice "Backup script completed."
   test "${NO_PUSHGATEWAY}" -ne 1 && {
-    backup_end_time=$(date +%s)
     pushgateway_send_result "${glbl_err}"
   }
 }
