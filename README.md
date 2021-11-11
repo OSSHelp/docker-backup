@@ -91,6 +91,7 @@ Setting|Default|Description
 `SSMTP_HOSTNAME`|`hostname -f`|SSMTP hostname
 `SSMTP_REWRITE_DOMAIN`|-|SSMTP  rewrite domain
 `SSMTP_FROM_LINE_OVERRIDE`|-|SSMTP From line override
+`STORAGE_UPLOAD_DIR`|-|Target directory to upload to the storage
 `SYNC_DIRS`|`[]`|List of directories for sync
 `SERVER_NAME`|-|Server for notifies
 `TIMEZONE`|`Europe/Moscow`|Timezone
