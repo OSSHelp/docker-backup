@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC1091
-. /usr/local/include/backup-functions.sh
+. /usr/local/include/osshelp/backup-functions.sh
 
 local_days={{ LOCAL_DAYS }}
 {% if RCLONE_STORAGE is defined %}remote_backups_daily={{ REMOTE_SCHEME.daily }}

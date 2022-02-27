@@ -24,8 +24,8 @@ COPY templates/* /usr/local/src/
 COPY helpers/* /usr/local/bin/
 COPY entrypoint.sh /usr/local/bin/
 COPY --from=pbzip2 /usr/bin/pbzip2 /usr/bin/
-ADD https://oss.help/scripts/backup/backup-functions/2-latest/backup-functions.sh /usr/local/include/
-ADD https://oss.help/scripts/pushgateway/pushgateway-functions/1-latest/pushgateway-functions.sh /usr/local/include/
+ADD https://oss.help/scripts/backup/backup-functions/2-latest/backup-functions.sh /usr/local/include/osshelp/
+ADD https://oss.help/scripts/pushgateway/pushgateway-functions/1-latest/pushgateway-functions.sh /usr/local/include/osshelp/
 
 ENV TIMEZONE="Europe/Moscow" \
 	CRON_TIME="{min: 15, hour: 3}" \
