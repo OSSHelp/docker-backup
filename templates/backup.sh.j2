@@ -1,7 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 . /usr/local/include/osshelp/backup-functions.sh
-
+cbver=1.0.1
 local_days={{ LOCAL_DAYS }}
 {% if RCLONE_STORAGE is defined %}remote_backups_daily={{ REMOTE_SCHEME.daily }}
 remote_backups_weekly={{ REMOTE_SCHEME.weekly }}
@@ -11,12 +11,12 @@ tar_exclude=({%for dir in COMPRES_DIRS_EXCLUDE %}--exclude={{ dir }} {% endfor %
 archiver_opts=({{ ARCHIVER_OPTS | default('')}})
 
 pushgateway_instance="{{ PUSHGATEWAY_INSTANCE | default('docker_backup') }}"
-pushgateway_url="{{ PUSHGATEWAY_URL | default('http://pushgateway:9091/pushgateway') }}/metrics/job/${0##*/}/instance/${pushgateway_instance}"
+pushgateway_url="{{ PUSHGATEWAY_URL | default('http://pushgateway:9091/pushgateway') }}/metrics/job/${0##*/}/source/${pushgateway_instance}"
 pushgateway_opts=({{ PUSHGATEWAY_OPTS | default('')}})
 
 redis_cli_opts=(-h {{ REDIS_HOST | default('redis') }}{{ ' -a ' ~ REDIS_PASSWORD if REDIS_PASSWORD is defined }} --raw)
-
-{% if MONGO_HOST is defined %}mongo_opts=(-h {{ MONGO_HOST }}{% if MONGO_PORT is defined %} --port {{ MONGO_PORT }}{% endif %}{% if MONGO_USER is defined %} -u {{ MONGO_USER }}{% endif %}{% if MONGO_PASSWORD is defined %} -p {{ MONGO_PASSWORD }}{% endif %}{% if MONGO_AUTHDB is defined %} --authenticationDatabase {{ MONGO_AUTHDB }}{% endif %})
+{% if GITLAB_DIR is defined %}gitlab_backup_dir="{{ GITLAB_DIR }}"{% endif %}
+{% if MONGO_HOST is defined %}mongo_opts=(--host {{ MONGO_HOST }}{% if MONGO_PORT is defined %} --port {{ MONGO_PORT }}{% endif %}{% if MONGO_USER is defined %} -u {{ MONGO_USER }}{% endif %}{% if MONGO_PASSWORD is defined %} -p {{ MONGO_PASSWORD }}{% endif %}{% if MONGO_AUTHDB is defined %} --authenticationDatabase {{ MONGO_AUTHDB }}{% endif %})
 mongo_ignore_databases="{%for db in MONGO_IGNORE_DBS %}{{ db }}{{ '|' if not loop.last else '' }}{% endfor %}"
 {% endif %}
 
@@ -36,20 +36,30 @@ function make_backup() {
   check_free_space "$backup_dir" && {
 {%for dir in COMPRES_DIRS %}    compress_dir "{{ dir }}" "$backup_dir/$current_date/dirs/{{ dir.split('/') | last }}.tar.$compress_ext"
 {% endfor %}{% if POSTGRES_PASSWORD is defined %}    pg_dump_all "$backup_dir/$current_date/postgres"{% endif %}
-{% if MYSQL_PASSWORD is defined %}    mysql_dump_all "$backup_dir/$current_date/mysql"{% endif %}
+{% if MYSQL_HOST is defined %}    mysql_dump_all "$backup_dir/$current_date/mysql"{% endif %}
 {% if REDIS_HOST is defined or REDIS_PASSWORD is defined %}    redis_rdb_backup "$backup_dir/$current_date/redis"{% endif %}
 {% if MONGO_HOST is defined %}    mongo_dump_all "$backup_dir/$current_date/mongo"{% endif %}
+{% if GITLAB_DIR is defined %}    backup_file="${gitlab_backup_dir}/$(ssh -oStrictHostKeyChecking=no git@gitlab /usr/bin/gitlab-rake gitlab:backup:create | grep -Po '\S+\.tar')"
+    test -d "${backup_dir}/${current_date}/gitlab/" || mkdir -p "${backup_dir}/${current_date}/gitlab/"
+    { test -f "${backup_file}" && mv "${backup_file}" "${backup_dir}/${current_date}/gitlab/" && show_notice "Moving backup file to it's folder..."; } \
+        || show_error "Backup file not found, check logs."
+    gitlab_archive="$(ls -1 ${backup_dir}/${current_date}/gitlab/)" && backup_size_and_files_count "${backup_dir}/${current_date}/gitlab/${gitlab_archive}"{% endif %}
 {% if CUSTOM_BACKUP_COMMANDS is defined %}{{ CUSTOM_BACKUP_COMMANDS }}{% endif %}
+{% if FILES_FOR_COUNT is defined %}{%for file in FILES_FOR_COUNT %}
+    backup_size_and_files_count "{{ file }}"{% endfor %}{% endif %}
     save_backup_size "$backup_dir/$current_date"
   }
 }
 
 function upload_backup() {
 {% if RCLONE_STORAGE is defined %}  show_notice "Upload process started..."
-{% for dir in SYNC_DIRS %}  rclone_sync {{ dir }} {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.name }}/sync/{{ dir.split('/') | last }}
-{% endfor %}  rclone_sync "$backup_dir/$current_date" "{{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.name }}/{% if STORAGE_UPLOAD_DIR | length > 0 %}{{ STORAGE_UPLOAD_DIR }}{% if STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type/$current_date"
-  rclone_purge {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.name }}/{% if STORAGE_UPLOAD_DIR | length > 0 %}{{ STORAGE_UPLOAD_DIR }}{% if STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type $remote_backups
-  show_notice "Upload process ended."{% else %}  return 0;{% endif %}
+  rclone_sync "$backup_dir/$current_date" "{{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.bucket | default (RCLONE_STORAGE.name) }}/{% if STORAGE_UPLOAD_DIR | length > 0 %}{{ STORAGE_UPLOAD_DIR }}{% if STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type/$current_date" {% if STORAGE_SYNC_MODE is defined %}{{ STORAGE_SYNC_MODE }}{% endif %}
+  rclone_purge {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.bucket | default (RCLONE_STORAGE.name) }}/{% if STORAGE_UPLOAD_DIR | length > 0 %}{{ STORAGE_UPLOAD_DIR }}{% if STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type $remote_backups
+{% for dir in SYNC_DIRS %}  rclone_sync {{ dir }} {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.name }}/sync/{{ dir.split('/') | last }} no_check
+{% endfor %}{% if RCLONE_ALT_STORAGE is defined %}  rclone_sync "$backup_dir/$current_date" "{{ RCLONE_ALT_STORAGE.name }}:{{ RCLONE_ALT_STORAGE.bucket | default (RCLONE_ALT_STORAGE.name) }}/{% if ALT_STORAGE_UPLOAD_DIR | length > 0 %}{{ ALT_STORAGE_UPLOAD_DIR }}{% if ALT_STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type/$current_date" {% if STORAGE_SYNC_MODE is defined %}{{ STORAGE_SYNC_MODE }}{% endif %}
+  rclone_purge {{ RCLONE_ALT_STORAGE.name }}:{{ RCLONE_ALT_STORAGE.bucket | default (RCLONE_ALT_STORAGE.name) }}/{% if ALT_STORAGE_UPLOAD_DIR | length > 0 %}{{ ALT_STORAGE_UPLOAD_DIR }}{% if ALT_STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type $remote_backups
+{% for dir in SYNC_DIRS %}  rclone_sync {{ dir }} {{ RCLONE_ALT_STORAGE.name }}:{{ RCLONE_ALT_STORAGE.name }}/sync/{{ dir.split('/') | last }} no_check
+{% endfor %}{% endif %}  show_notice "Upload process ended."{% else %}  return 0;{% endif %}
 }
 
 function send_notify() {
@@ -58,28 +68,36 @@ function send_notify() {
 
 function main() {
   show_notice "Backup script started."
-  test "${NO_PUSHGATEWAY}" -ne 1 && pushgateway_send_script_start
+  need_metrics && {
+      script_start_time=$(date +%s)
+      pushgateway_register_metrics
+      pushgateway_set_value backup_is_running 1 "${pushgateway_default_labels[@]}"
+      pushgateway_send_metrics
+  }
   detect_type
   make_flock
 
   case "$1" in
     "--backup"|"-b")
-      test "${no_pushgateway}" -ne 1 && pushgateway_send_backup_start
+      script_mode="backup_only"
+      need_metrics && pushgateway_send_backup_start
       make_backup
-      test "${no_pushgateway}" -ne 1 && pushgateway_send_backup_end
+      need_metrics && pushgateway_send_backup_end
     ;;
     "--upload"|"-u")
-      test "${no_pushgateway}" -ne 1 && pushgateway_send_upload_start
+      script_mode="upload_only"
+      need_metrics && pushgateway_send_upload_start
       upload_backup
-      test "${no_pushgateway}" -ne 1 && pushgateway_send_upload_end
+      need_metrics && pushgateway_send_upload_end
     ;;
     *)
-      test "${no_pushgateway}" -ne 1 && pushgateway_send_backup_start
+      script_mode="default"
+      need_metrics && pushgateway_send_backup_start
       make_backup
-      test "${no_pushgateway}" -ne 1 && pushgateway_send_backup_end
-      test "${no_pushgateway}" -ne 1 && pushgateway_send_upload_start
+      need_metrics && pushgateway_send_backup_end
+      need_metrics && pushgateway_send_upload_start
       upload_backup
-      test "${no_pushgateway}" -ne 1 && pushgateway_send_upload_end
+      need_metrics && pushgateway_send_upload_end
     ;;
   esac
 
@@ -88,9 +106,7 @@ function main() {
 {% if MAILTO is defined %}    send_notify{% endif %}
   }
   show_notice "Backup script completed."
-  test "${NO_PUSHGATEWAY}" -ne 1 && {
-    pushgateway_send_result "${glbl_err}"
-  }
+  need_metrics && pushgateway_send_result "${glbl_err}"
 }
 
 main "${@}"

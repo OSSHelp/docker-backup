@@ -65,6 +65,8 @@ Setting|Default|Description
 `CRON_TIME`|`{min: 15, hour: 3}`|Backup task cron time
 `CRON_LOGLEVEL`|`8`|Cron Log Level. Most verbose 0
 `CUSTOM_BACKUP_COMMANDS`|-|Custom command(s) for backup function
+`FILES_FOR_COUNT`|`[]`|List of files for manual counting
+`GITLAB_DIR`|-| Path for Gitlab backup dir (mounted from gitlab container)
 `LOCAL_DAYS`|`0`|Number of local copies +1
 `MONGO_HOST`|-|MongoDB host
 `MONGO_AUTH_DB`|`admin`|MongoDB authentication database
@@ -72,9 +74,9 @@ Setting|Default|Description
 `MONGO_PASSWORD`|-|MongoDB password
 `MONGO_IGNORE_DBS`|`[]`|List of ignored databases
 `MAILTO`|-|Notify email address
-`MYSQL_HOST`|`mysql`|MySQL host
+`MYSQL_HOST`|-|MySQL host
 `MYSQL_USER`|`root`|MySQL user
-`MYSQL_PASSWORD`|-|MySQL password
+`MYSQL_PASSWORD`|-|MySQL password (not added to my.cnf if it's not defineded)
 `MYSQL_IGNORE_DBS`|`[information_schema, performance_schema, pinba, phpmyadmin, sys]`|List of ignored databases
 `NO_PUSHGATEWAY` |`0`|Disable send metrics to Pushgateway if `1`
 `POSTGRES_HOST`|`postgres`|PostgreSQL host
@@ -84,6 +86,7 @@ Setting|Default|Description
 `PUSHGATEWAY_URL`|`http://pushgateway:9091`|Pushgateway URL
 `PUSHGATEWAY_OPTS`|`-`|Additional curl parameters, which is used by functions to transfer data to Pushgateway
 `RCLONE_STORAGE`|-|Rclone remote storage
+`RCLONE_ALT_STORAGE`|-|Rclone alternative remote storage (additional)
 `REMOTE_SCHEME`|`{daily: 7, weekly: 4, monthly: 3}`|Number of remote copies by type
 `REDIS_HOST`|-|Redis host
 `REDIS_PASSWORD`|-|Redis password
@@ -91,7 +94,8 @@ Setting|Default|Description
 `SSMTP_HOSTNAME`|`hostname -f`|SSMTP hostname
 `SSMTP_REWRITE_DOMAIN`|-|SSMTP  rewrite domain
 `SSMTP_FROM_LINE_OVERRIDE`|-|SSMTP From line override
-`STORAGE_UPLOAD_DIR`|-|Target directory to upload to the storage
+`STORAGE_UPLOAD_DIR/ALT_STORAGE_UPLOAD_DIR`|-|Target directory to upload to the storage/alternative storage
+`STORAGE_SYNC_MODE`|`default`|Rclone sync function mode, set no_check if you need disable checking files in storage
 `SYNC_DIRS`|`[]`|List of directories for sync
 `SERVER_NAME`|-|Server for notifies
 `TIMEZONE`|`Europe/Moscow`|Timezone
@@ -120,6 +124,7 @@ The format is the same as in [the Ansible role](https://gitea.osshelp.ru/ansible
 Setting|Default|Description
 ---|---|---
 `name`|-|Storage name
+`bucket`|-|Storage bucket name, if not set then equals name
 `key`|-|Key:value for rclone storage
 
 Example:
@@ -127,6 +132,7 @@ Example:
 ```yaml
     environment:
       RCLONE_STORAGE: "{name: b2_storage_name, type: b2, account: $B2_ACCOUNT, key: $B2_KEY}"
+      RCLONE_ALT_STORAGE: "{name: osshelp_storage, bucket: client-backup, type: s3, endpoint: scanros.ossdata.ru, region: local, provider: Minio, access_key_id: $OSS_ACCOUNT, secret_access_key: $OSS_KEY}"
 ```
 
 ### Internal usage
@@ -146,7 +152,6 @@ There is no difference between the DockerHub image and the oss.help/pub image.
 ## TODO
 
 - Tests
-- Add MongoDB Auth support
 - Add RethinkDB support (Python)
 - Add log file /backup/backup.log (last backup only)
 - Add stderr_exclude support if needed

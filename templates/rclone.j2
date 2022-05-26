@@ -1,3 +1,9 @@
-[{{ RCLONE_STORAGE.name }}]
-{% for key, value in RCLONE_STORAGE.items() %}{% if key != 'name' %}{{ key }} = {{ value }}{% endif %}
-{% endfor %}
+{% if RCLONE_STORAGE is defined %}[{{ RCLONE_STORAGE.name }}]
+{% for key, value in RCLONE_STORAGE.items() %}{%- if key != 'name' %}{%- if key != 'bucket' %}
+{{ key }} = {{ value }}{% endif -%}{% endif -%}
+{% endfor %}{% endif %}
+
+{% if RCLONE_ALT_STORAGE is defined %}[{{ RCLONE_ALT_STORAGE.name }}]
+{% for key, value in RCLONE_ALT_STORAGE.items() %}{%- if key != 'name' %}{%- if key != 'bucket' %}
+{{ key }} = {{ value }}{% endif -%}{% endif -%}
+{% endfor %}{% endif %}

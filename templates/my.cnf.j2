@@ -1,4 +1,5 @@
-[client]
-  host={{ MYSQL_HOST | default('mysql') }}
-  user={{ MYSQL_USER | default('root') }}
-  password={{ MYSQL_PASSWORD | default('password') }}
+{% if MYSQL_HOST is defined %}[client]
+host={{ MYSQL_HOST }}
+user={{ MYSQL_USER | default('root') }}
+{% if MYSQL_PASSWORD is defined %}password={{ MYSQL_PASSWORD }}{% endif %}
+{% endif %}
