@@ -39,10 +39,13 @@ function make_backup() {
 {% if MYSQL_HOST is defined %}    mysql_dump_all "$backup_dir/$current_date/mysql"{% endif %}
 {% if REDIS_HOST is defined or REDIS_PASSWORD is defined %}    redis_rdb_backup "$backup_dir/$current_date/redis"{% endif %}
 {% if MONGO_HOST is defined %}    mongo_dump_all "$backup_dir/$current_date/mongo"{% endif %}
-{% if GITLAB_DIR is defined %}    backup_file="${gitlab_backup_dir}/$(ssh -oStrictHostKeyChecking=no git@gitlab /usr/bin/gitlab-rake gitlab:backup:create | grep -Po '\S+\.tar')"
-    test -d "${backup_dir}/${current_date}/gitlab/" || mkdir -p "${backup_dir}/${current_date}/gitlab/"
+{% if GITLAB_DIR is defined %}  show_notice "Creating backup in Gitlab."   
+    backup_file="${gitlab_backup_dir}/$(ssh -oStrictHostKeyChecking=no git@gitlab /usr/bin/gitlab-rake gitlab:backup:create | grep -Po '\S+\.tar')"
+    show_notice "Creating folder for backup in the backup directory." 
+    test -d "${backup_dir}/${current_date}/gitlab/" || mkdir -p "${backup_dir}/${current_date}/gitlab/" 
     { test -f "${backup_file}" && mv "${backup_file}" "${backup_dir}/${current_date}/gitlab/" && show_notice "Moving backup file to it's folder..."; } \
         || show_error "Backup file not found, check logs."
+    show_notice "Calculating backup size." 
     gitlab_archive="$(ls -1 ${backup_dir}/${current_date}/gitlab/)" && backup_size_and_files_count "${backup_dir}/${current_date}/gitlab/${gitlab_archive}"{% endif %}
 {% if CUSTOM_BACKUP_COMMANDS is defined %}{{ CUSTOM_BACKUP_COMMANDS }}{% endif %}
 {% if FILES_FOR_COUNT is defined %}{%for file in FILES_FOR_COUNT %}
