@@ -1,5 +1,6 @@
 {% if MYSQL_HOST is defined %}[client]
 host={{ MYSQL_HOST }}
+port={{ MYSQL_PORT | default('3306') }}
 user={{ MYSQL_USER | default('root') }}
 {% if MYSQL_PASSWORD is defined %}password={{ MYSQL_PASSWORD }}{% endif %}
 {% endif %}

@@ -75,14 +75,18 @@ Setting|Default|Description
 `MONGO_IGNORE_DBS`|`[]`|List of ignored databases
 `MAILTO`|-|Notify email address
 `MYSQL_HOST`|-|MySQL host
+`MYSQL_PORT`|`3306`|MySQL port
 `MYSQL_USER`|`root`|MySQL user
 `MYSQL_PASSWORD`|-|MySQL password (not added to my.cnf if it's not defineded)
 `MYSQL_IGNORE_DBS`|`[information_schema, performance_schema, pinba, phpmyadmin, sys]`|List of ignored databases
 `NO_PUSHGATEWAY` |`0`|Disable send metrics to Pushgateway if `1`
 `POSTGRES_HOST`|`postgres`|PostgreSQL host
+`POSTGRES_PORT`|`5432`|PostgreSQL port
+`POSTGRES_CONNECTION_DB`|`postgres`|PostgreSQL connection db
 `POSTGRES_USER`|`postgres`|PostgreSQL user
 `POSTGRES_PASSWORD`|-|PostgreSQL password
 `POSTGRES_IGNORE_DBS`|`[template]`|List of ignored databases
+`POSTGRES_SKIP_GLOBALS`|-|Skip dump globals objects if `1`. Useful for managed PostgreSQL servers
 `PUSHGATEWAY_URL`|`http://pushgateway:9091`|Pushgateway URL
 `PUSHGATEWAY_OPTS`|`-`|Additional curl parameters, which is used by functions to transfer data to Pushgateway
 `RCLONE_STORAGE`|-|Rclone remote storage
