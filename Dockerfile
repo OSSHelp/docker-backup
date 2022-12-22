@@ -10,7 +10,7 @@ RUN apk add --no-cache --virtual .build-deps bzip2-dev g++ make \
         && apk del --no-cache .build-deps \
         && rm -r /tmp/pbzip2-1.1.13
 
-FROM alpine:3.15
+FROM alpine:3.17
 # hadolint ignore=DL3018,DL3013
 RUN apk add --no-cache bash python3 py3-setuptools py3-yaml tzdata tar bzip2 grep \
         coreutils curl ssmtp mailx rclone redis mysql-client postgresql openssh \
