@@ -60,10 +60,10 @@ function upload_backup() {
 {% if RCLONE_STORAGE is defined %}  show_notice "Upload process started..."
   rclone_sync "$backup_dir/$current_date" "{{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.bucket | default (RCLONE_STORAGE.name) }}/{% if STORAGE_UPLOAD_DIR | length > 0 %}{{ STORAGE_UPLOAD_DIR }}{% if STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type/$current_date" {% if STORAGE_SYNC_MODE is defined %}{{ STORAGE_SYNC_MODE }}{% endif %}
   rclone_purge {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.bucket | default (RCLONE_STORAGE.name) }}/{% if STORAGE_UPLOAD_DIR | length > 0 %}{{ STORAGE_UPLOAD_DIR }}{% if STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type $remote_backups
-{% for dir in SYNC_DIRS %}  rclone_sync {{ dir }} {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.name }}/sync/{{ dir.split('/') | last }} no_check
+{% for dir in SYNC_DIRS %}  rclone_sync {{ dir }} {{ RCLONE_STORAGE.name }}:{{ RCLONE_STORAGE.bucket | default (RCLONE_STORAGE.name) }}/sync/{{ dir.split('/') | last }} no_check
 {% endfor %}{% if RCLONE_ALT_STORAGE is defined %}  rclone_sync "$backup_dir/$current_date" "{{ RCLONE_ALT_STORAGE.name }}:{{ RCLONE_ALT_STORAGE.bucket | default (RCLONE_ALT_STORAGE.name) }}/{% if ALT_STORAGE_UPLOAD_DIR | length > 0 %}{{ ALT_STORAGE_UPLOAD_DIR }}{% if ALT_STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type/$current_date" {% if STORAGE_SYNC_MODE is defined %}{{ STORAGE_SYNC_MODE }}{% endif %}
   rclone_purge {{ RCLONE_ALT_STORAGE.name }}:{{ RCLONE_ALT_STORAGE.bucket | default (RCLONE_ALT_STORAGE.name) }}/{% if ALT_STORAGE_UPLOAD_DIR | length > 0 %}{{ ALT_STORAGE_UPLOAD_DIR }}{% if ALT_STORAGE_UPLOAD_DIR.endswith("/") %}{% else %}/{% endif %}{% endif %}$type $remote_backups
-{% for dir in SYNC_DIRS %}  rclone_sync {{ dir }} {{ RCLONE_ALT_STORAGE.name }}:{{ RCLONE_ALT_STORAGE.name }}/sync/{{ dir.split('/') | last }} no_check
+{% for dir in SYNC_DIRS %}  rclone_sync {{ dir }} {{ RCLONE_ALT_STORAGE.name }}:{{ RCLONE_ALT_STORAGE.bucket | default (RCLONE_ALT_STORAGE.name) }}/sync/{{ dir.split('/') | last }} no_check
 {% endfor %}{% endif %}  show_notice "Upload process ended."{% else %}  return 0;{% endif %}
 }
 
