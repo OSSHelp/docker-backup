@@ -40,6 +40,7 @@ ENV TIMEZONE="Europe/Moscow" \
         MYSQL_IGNORE_DBS="[information_schema, performance_schema, pinba, phpmyadmin, sys]" \
         MONGO_IGNORE_DBS="[]" \
         NO_PUSHGATEWAY="0" \
-        STORAGE_UPLOAD_DIR='""'
+        STORAGE_UPLOAD_DIR='""' \
+        ALT_STORAGE_UPLOAD_DIR='""'
 
 ENTRYPOINT ["entrypoint.sh"]
