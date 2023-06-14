@@ -9,7 +9,7 @@ remote_backups_monthly={{ REMOTE_SCHEME.monthly }}
 {% endif %}
 tar_exclude=({%for dir in COMPRES_DIRS_EXCLUDE %}--exclude={{ dir }} {% endfor %})
 archiver_opts=({{ ARCHIVER_OPTS | default('')}})
-
+mysql_opts=({{ MYSQL_OPTS | default('')}})
 pushgateway_instance="{{ PUSHGATEWAY_INSTANCE | default('docker_backup') }}"
 pushgateway_url="{{ PUSHGATEWAY_URL | default('http://pushgateway:9091/pushgateway') }}/metrics/job/${0##*/}/source/${pushgateway_instance}"
 pushgateway_opts=({{ PUSHGATEWAY_OPTS | default('')}})

@@ -78,6 +78,7 @@ Setting|Default|Description
 `MYSQL_PORT`|`3306`|MySQL port
 `MYSQL_USER`|`root`|MySQL user
 `MYSQL_PASSWORD`|-|MySQL password (not added to my.cnf if it's not defineded)
+`MYSQL_OPTS`|-|Additional optioins for mysqldump
 `MYSQL_IGNORE_DBS`|`[information_schema, performance_schema, pinba, phpmyadmin, sys]`|List of ignored databases
 `NO_PUSHGATEWAY` |`0`|Disable send metrics to Pushgateway if `1`
 `POSTGRES_HOST`|`postgres`|PostgreSQL host
