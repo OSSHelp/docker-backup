@@ -7,6 +7,7 @@ local_days={{ LOCAL_DAYS }}
 remote_backups_weekly={{ REMOTE_SCHEME.weekly }}
 remote_backups_monthly={{ REMOTE_SCHEME.monthly }}
 {% endif %}
+no_compress={{ NO_COMPRESS }}
 tar_exclude=({%for dir in COMPRES_DIRS_EXCLUDE %}--exclude={{ dir }} {% endfor %})
 archiver_opts=({{ ARCHIVER_OPTS | default('')}})
 mysql_opts=({{ MYSQL_OPTS | default('')}})

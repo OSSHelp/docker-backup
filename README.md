@@ -57,63 +57,64 @@ Internal vars in CUSTOM_BACKUP_COMMANDS must be escaped like `$$`.
 
 ## Parameters
 
-Setting|Default|Description
----|---|---
-`ARCHIVER_OPTS`|`-`|Additional optioins for archiver
-`COMPRES_DIRS`|`[]`|List of directories for backup
-`COMPRES_DIRS_EXCLUDE`|`[]`|List of direcotries for exlude
-`CRON_TIME`|`{min: 15, hour: 3}`|Backup task cron time
-`CRON_LOGLEVEL`|`8`|Cron Log Level. Most verbose 0
-`CUSTOM_BACKUP_COMMANDS`|-|Custom command(s) for backup function
-`FILES_FOR_COUNT`|`[]`|List of files for manual counting
-`GITLAB_DIR`|-| Path for Gitlab backup dir (mounted from gitlab container)
-`LOCAL_DAYS`|`0`|Number of local copies +1
-`MONGO_HOST`|-|MongoDB host
-`MONGO_AUTH_DB`|`admin`|MongoDB authentication database
-`MONGO_USER`|`admin`|MongoDB user
-`MONGO_PASSWORD`|-|MongoDB password
-`MONGO_IGNORE_DBS`|`[]`|List of ignored databases
-`MAILTO`|-|Notify email address
-`MYSQL_HOST`|-|MySQL host
-`MYSQL_PORT`|`3306`|MySQL port
-`MYSQL_USER`|`root`|MySQL user
-`MYSQL_PASSWORD`|-|MySQL password (not added to my.cnf if it's not defineded)
-`MYSQL_OPTS`|-|Additional optioins for mysqldump
-`MYSQL_IGNORE_DBS`|`[information_schema, performance_schema, pinba, phpmyadmin, sys]`|List of ignored databases
-`NO_PUSHGATEWAY` |`0`|Disable send metrics to Pushgateway if `1`
-`POSTGRES_HOST`|`postgres`|PostgreSQL host
-`POSTGRES_PORT`|`5432`|PostgreSQL port
-`POSTGRES_CONNECTION_DB`|`postgres`|PostgreSQL connection db
-`POSTGRES_USER`|`postgres`|PostgreSQL user
-`POSTGRES_PASSWORD`|-|PostgreSQL password
-`POSTGRES_IGNORE_DBS`|`[template]`|List of ignored databases
-`POSTGRES_SKIP_GLOBALS`|-|Skip dump globals objects if `1`. Useful for managed PostgreSQL servers
-`PUSHGATEWAY_URL`|`http://pushgateway:9091`|Pushgateway URL
-`PUSHGATEWAY_OPTS`|`-`|Additional curl parameters, which is used by functions to transfer data to Pushgateway
-`RCLONE_STORAGE`|-|Rclone remote storage
-`RCLONE_ALT_STORAGE`|-|Rclone alternative remote storage (additional)
-`REMOTE_SCHEME`|`{daily: 7, weekly: 4, monthly: 3}`|Number of remote copies by type
-`REDIS_HOST`|-|Redis host
-`REDIS_PASSWORD`|-|Redis password
-`SSMTP_MAILHUB`|container default gateway|Mail relay host
-`SSMTP_HOSTNAME`|`hostname -f`|SSMTP hostname
-`SSMTP_REWRITE_DOMAIN`|-|SSMTP  rewrite domain
-`SSMTP_FROM_LINE_OVERRIDE`|-|SSMTP From line override
-`STORAGE_UPLOAD_DIR/ALT_STORAGE_UPLOAD_DIR`|-|Target directory to upload to the storage/alternative storage
-`STORAGE_SYNC_MODE`|`default`|Rclone sync function mode, set no_check if you need disable checking files in storage
-`SYNC_DIRS`|`[]`|List of directories for sync
-`SERVER_NAME`|-|Server for notifies
-`TIMEZONE`|`Europe/Moscow`|Timezone
+Setting                                     | Default                                                            | Description
+--------------------------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------------------
+`ARCHIVER_OPTS`                             | `-`                                                                | Additional optioins for archiver
+`COMPRES_DIRS`                              | `[]`                                                               | List of directories for backup
+`COMPRES_DIRS_EXCLUDE`                      | `[]`                                                               | List of direcotries for exlude
+`CRON_TIME`                                 | `{min: 15, hour: 3}`                                               | Backup task cron time
+`CRON_LOGLEVEL`                             | `8`                                                                | Cron Log Level. Most verbose 0
+`CUSTOM_BACKUP_COMMANDS`                    | -                                                                  | Custom command(s) for backup function
+`FILES_FOR_COUNT`                           | `[]`                                                               | List of files for manual counting
+`GITLAB_DIR`                                | -                                                                  | Path for Gitlab backup dir (mounted from gitlab container)
+`LOCAL_DAYS`                                | `0`                                                                | Number of local copies +1
+`MONGO_HOST`                                | -                                                                  | MongoDB host
+`MONGO_AUTH_DB`                             | `admin`                                                            | MongoDB authentication database
+`MONGO_USER`                                | `admin`                                                            | MongoDB user
+`MONGO_PASSWORD`                            | -                                                                  | MongoDB password
+`MONGO_IGNORE_DBS`                          | `[]`                                                               | List of ignored databases
+`MAILTO`                                    | -                                                                  | Notify email address
+`MYSQL_HOST`                                | -                                                                  | MySQL host
+`MYSQL_PORT`                                | `3306`                                                             | MySQL port
+`MYSQL_USER`                                | `root`                                                             | MySQL user
+`MYSQL_PASSWORD`                            | -                                                                  | MySQL password (not added to my.cnf if it's not defineded)
+`MYSQL_OPTS`                                | -                                                                  | Additional optioins for mysqldump
+`MYSQL_IGNORE_DBS`                          | `[information_schema, performance_schema, pinba, phpmyadmin, sys]` | List of ignored databases
+`NO_PUSHGATEWAY`                            | `0`                                                                | Disable send metrics to Pushgateway if `1`
+`POSTGRES_HOST`                             | `postgres`                                                         | PostgreSQL host
+`POSTGRES_PORT`                             | `5432`                                                             | PostgreSQL port
+`POSTGRES_CONNECTION_DB`                    | `postgres`                                                         | PostgreSQL connection db
+`POSTGRES_USER`                             | `postgres`                                                         | PostgreSQL user
+`POSTGRES_PASSWORD`                         | -                                                                  | PostgreSQL password
+`POSTGRES_IGNORE_DBS`                       | `[template]`                                                       | List of ignored databases
+`POSTGRES_SKIP_GLOBALS`                     | -                                                                  | Skip dump globals objects if `1`. Useful for managed PostgreSQL servers
+`PUSHGATEWAY_URL`                           | `http://pushgateway:9091`                                          | Pushgateway URL
+`PUSHGATEWAY_OPTS`                          | `-`                                                                | Additional curl parameters, which is used by functions to transfer data to Pushgateway
+`RCLONE_STORAGE`                            | -                                                                  | Rclone remote storage
+`RCLONE_ALT_STORAGE`                        | -                                                                  | Rclone alternative remote storage (additional)
+`REMOTE_SCHEME`                             | `{daily: 7, weekly: 4, monthly: 3}`                                | Number of remote copies by type
+`REDIS_HOST`                                | -                                                                  | Redis host
+`REDIS_PASSWORD`                            | -                                                                  | Redis password
+`SSMTP_MAILHUB`                             | container default gateway                                          | Mail relay host
+`SSMTP_HOSTNAME`                            | `hostname -f`                                                      | SSMTP hostname
+`SSMTP_REWRITE_DOMAIN`                      | -                                                                  | SSMTP  rewrite domain
+`SSMTP_FROM_LINE_OVERRIDE`                  | -                                                                  | SSMTP From line override
+`STORAGE_UPLOAD_DIR/ALT_STORAGE_UPLOAD_DIR` | -                                                                  | Target directory to upload to the storage/alternative storage
+`STORAGE_SYNC_MODE`                         | `default`                                                          | Rclone sync function mode, set no_check if you need disable checking files in storage
+`SYNC_DIRS`                                 | `[]`                                                               | List of directories for sync
+`SERVER_NAME`                               | -                                                                  | Server for notifies
+`TIMEZONE`                                  | `Europe/Moscow`                                                    | Timezone
+`NO_COMPRESS`                               | `0`                                                                | Enable compressing in DB dump functions
 
 ### Cron time format
 
-Setting|Default|Description
----|---|---
-`min`|`15`|Minute
-`hour`|`3`|Hour
-`day`|`*`|Day of mounth
-`mounth`|`*`|Mounth
-`day_of_week`|`*`|Day of week
+Setting       | Default | Description
+--------------|---------|--------------
+`min`         | `15`    | Minute
+`hour`        | `3`     | Hour
+`day`         | `*`     | Day of mounth
+`mounth`      | `*`     | Mounth
+`day_of_week` | `*`     | Day of week
 
 Example:
 
@@ -126,11 +127,11 @@ Example:
 
 The format is the same as in [the Ansible role](https://gitea.osshelp.ru/ansible/rclone):
 
-Setting|Default|Description
----|---|---
-`name`|-|Storage name
-`bucket`|-|Storage bucket name, if not set then equals name
-`key`|-|Key:value for rclone storage
+Setting  | Default | Description
+---------|---------|-------------------------------------------------
+`name`   | -       | Storage name
+`bucket` | -       | Storage bucket name, if not set then equals name
+`key`    | -       | Key:value for rclone storage
 
 Example:
 
